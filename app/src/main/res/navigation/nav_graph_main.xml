@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_main"
+    app:startDestination="@id/menuFragment">
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="io.github.lettucech.example.android.viewanimations.fragment.MenuFragment"
+        android:label="MenuFragment"
+        tools:layout="@layout/fragment_menu">
+        <action
+            android:id="@+id/action_menuFragment_to_propertyAnimationFragment"
+            app:destination="@id/propertyAnimationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/propertyAnimationFragment"
+        android:name="io.github.lettucech.example.android.viewanimations.fragment.PropertyAnimationFragment"
+        android:label="PropertyAnimationFragment"
+        tools:layout="@layout/fragment_property_animation" />
+</navigation>
