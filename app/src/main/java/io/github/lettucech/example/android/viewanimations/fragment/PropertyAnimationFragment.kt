@@ -9,15 +9,26 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import io.github.lettucech.example.android.viewanimations.R
+import io.github.lettucech.example.android.viewanimations.model.CustomLog
 import io.github.lettucech.example.android.viewanimations.util.AnimatorType
 import io.github.lettucech.example.android.viewanimations.util.InterpolatorType
+import io.github.lettucech.example.android.viewanimations.viewmodel.LogViewModel
 import kotlinx.android.synthetic.main.fragment_property_animation.*
 
 /**
  * Created by Brian Ho on 2019-07-12.
  */
 class PropertyAnimationFragment : Fragment() {
+
+    private var logViewModel: LogViewModel? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        logViewModel = ViewModelProviders.of(requireActivity()).get(LogViewModel::class.java)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,7 +62,10 @@ class PropertyAnimationFragment : Fragment() {
 
         btn_start_animation.setOnClickListener {
             when (spinner_animator.selectedItemPosition) {
-                0 -> startValueAnimation()
+                0 -> {
+                    logViewModel?.addLog("Triggered ValueAnimation")
+                    startValueAnimation()
+                }
             }
         }
     }
@@ -69,14 +83,26 @@ class PropertyAnimationFragment : Fragment() {
     private fun startValueAnimation() {
         val animationValue =
             (resources.displayMetrics.widthPixels - view_animation_object.width - view_animation_object.marginRight * 2).toFloat()
+        logViewModel?.addLog("Set animation value")
+
         val animation = ValueAnimator.ofFloat(animationValue).apply {
             duration = 1000
             interpolator = getSelectedInterpolator()
             addUpdateListener { updatedAnimation ->
+                logViewModel?.addLog("Animated value = " + updatedAnimation.animatedValue)
                 view_animation_object.translationX = updatedAnimation.animatedValue as Float
             }
+            logViewModel?.addLog(
+                String.format(
+                    "Creating animator\nDuration = %s\nInterpolator = %s",
+                    duration,
+                    interpolator::class.java.simpleName
+                )
+            )
         }
+
         animation.start()
+        logViewModel?.addLog("Start animation")
     }
 }
 
