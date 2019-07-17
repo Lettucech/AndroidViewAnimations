@@ -11,10 +11,9 @@ import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import io.github.lettucech.example.android.viewanimations.R
-import io.github.lettucech.example.android.viewanimations.model.CustomLog
 import io.github.lettucech.example.android.viewanimations.util.AnimatorType
 import io.github.lettucech.example.android.viewanimations.util.InterpolatorType
-import io.github.lettucech.example.android.viewanimations.viewmodel.LogViewModel
+import io.github.lettucech.example.android.viewanimations.viewmodel.LogConsoleViewModel
 import kotlinx.android.synthetic.main.fragment_property_animation.*
 
 /**
@@ -22,11 +21,11 @@ import kotlinx.android.synthetic.main.fragment_property_animation.*
  */
 class PropertyAnimationFragment : Fragment() {
 
-    private var logViewModel: LogViewModel? = null
+    private var logViewModel: LogConsoleViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProviders.of(requireActivity()).get(LogViewModel::class.java)
+        logViewModel = ViewModelProviders.of(requireActivity()).get(LogConsoleViewModel::class.java)
     }
 
     override fun onCreateView(

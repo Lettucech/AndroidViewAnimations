@@ -12,20 +12,20 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.lettucech.example.android.viewanimations.R
 import io.github.lettucech.example.android.viewanimations.adapter.LogAdapter
 import io.github.lettucech.example.android.viewanimations.model.CustomLog
-import io.github.lettucech.example.android.viewanimations.viewmodel.LogViewModel
+import io.github.lettucech.example.android.viewanimations.viewmodel.LogConsoleViewModel
 import kotlinx.android.synthetic.main.fragment_log.*
 
 /**
  * Created by Brian Ho on 2019-07-17.
  */
-class LogFragment : Fragment() {
-    private var logViewModel: LogViewModel? = null
+class LogConsoleFragment : Fragment() {
+    private var logViewModel: LogConsoleViewModel? = null
     private var logAdapter = LogAdapter()
     private var adapterDataObserver: RecyclerView.AdapterDataObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProviders.of(requireActivity()).get(LogViewModel::class.java)
+        logViewModel = ViewModelProviders.of(requireActivity()).get(LogConsoleViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -38,6 +38,16 @@ class LogFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        logViewModel?.getLogPanelOpened()?.observe(this, Observer<Boolean> {
+            if (it) {
+                imageView_clear_log.visibility = View.VISIBLE
+                imageView_stick_to_bottom.visibility = View.VISIBLE
+            } else {
+                imageView_clear_log.visibility = View.GONE
+                imageView_stick_to_bottom.visibility = View.GONE
+            }
+        })
 
         recyclerView_log.apply {
             itemAnimator = null
