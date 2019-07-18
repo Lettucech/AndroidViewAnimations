@@ -29,4 +29,11 @@ class LogConsoleViewModel : ViewModel() {
             logList.value = it
         }
     }
+
+    fun clearLog() {
+        logList.value?.let {
+            it.clear()
+            logList.value = it
+        }
+    }
 }

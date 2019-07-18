@@ -37,9 +37,25 @@ class LogAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         view.findViewById<TextView>(R.id.textView_message).text = log.message
     }
 
-    fun addLog(log : CustomLog) {
+    fun addLog(log: CustomLog) {
         customLog.add(log)
+        if (customLog.size > MAX_LOG_COUNT) {
+            val numberOfLogToBeRemoved = customLog.size - MAX_LOG_COUNT
+            for (i in 0 until numberOfLogToBeRemoved) {
+                customLog.removeAt(0)
+            }
+            notifyItemRangeRemoved(0, numberOfLogToBeRemoved)
+        }
         notifyItemInserted(customLog.size)
+    }
+
+    fun clear() {
+        customLog.clear()
+        notifyDataSetChanged()
+    }
+
+    companion object {
+        const val MAX_LOG_COUNT = 200
     }
 
     private class ViewHolder(view: View) : RecyclerView.ViewHolder(view)

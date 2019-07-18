@@ -1,5 +1,6 @@
 package io.github.lettucech.example.android.viewanimations.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ class LogConsoleFragment : Fragment() {
     private var logViewModel: LogConsoleViewModel? = null
     private var logAdapter = LogAdapter()
     private var adapterDataObserver: RecyclerView.AdapterDataObserver? = null
+    private var stickToBottom = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +57,13 @@ class LogConsoleFragment : Fragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    (recyclerView_log.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-                        positionStart - 1,
-                        0
-                    )
+                    if (stickToBottom) {
+                        val manager = recyclerView_log.layoutManager as LinearLayoutManager
+                        manager.scrollToPositionWithOffset(
+                            positionStart - 1,
+                            0
+                        )
+                    }
                 }
             }
             adapterDataObserver?.let { logAdapter.registerAdapterDataObserver(it) }
@@ -67,8 +72,25 @@ class LogConsoleFragment : Fragment() {
         logViewModel?.getLogList()?.observe(this, Observer<ArrayList<CustomLog>> {
             if (it.size > 0) {
                 logAdapter.addLog(it[it.size - 1])
+            } else {
+                logAdapter.clear()
             }
         })
+
+        imageView_clear_log.setOnClickListener {
+            logViewModel?.clearLog()
+        }
+
+        imageView_stick_to_bottom.setColorFilter(Color.GREEN)
+        imageView_stick_to_bottom.setOnClickListener {
+            stickToBottom = !stickToBottom
+            if (stickToBottom) {
+                imageView_stick_to_bottom.setColorFilter(Color.GREEN)
+                recyclerView_log.scrollToPosition(logAdapter.itemCount - 1)
+            } else {
+                imageView_stick_to_bottom.setColorFilter(Color.WHITE)
+            }
+        }
     }
 
     override fun onDestroy() {
