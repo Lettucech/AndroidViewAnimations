@@ -1,12 +1,13 @@
 package io.github.lettucech.example.android.viewanimations.fragment
 
-import android.animation.TimeInterpolator
-import android.animation.ValueAnimator
+import android.animation.*
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.content.ContextCompat
 import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -60,10 +61,18 @@ class PropertyAnimationFragment : Fragment() {
 
 
         btn_start_animation.setOnClickListener {
-            when (spinner_animator.selectedItemPosition) {
-                0 -> {
+            when (spinner_animator.selectedItem) {
+                AnimatorType.VALUE_ANIMATOR.label -> {
                     logViewModel?.addLog("Triggered ValueAnimation")
                     startValueAnimation()
+                }
+                AnimatorType.OBJECT_ANIMATOR.label -> {
+                    logViewModel?.addLog("Triggered ObjectAnimation")
+                    startObjectAnimation()
+                }
+                AnimatorType.ANIMATOR_SET.label -> {
+                    logViewModel?.addLog("Triggered AnimatorSet")
+                    startAnimatorSet()
                 }
             }
         }
@@ -80,28 +89,130 @@ class PropertyAnimationFragment : Fragment() {
     }
 
     private fun startValueAnimation() {
+        logViewModel?.addLog("Creating ValueAnimator")
         val animationValue =
             (resources.displayMetrics.widthPixels - view_animation_object.width - view_animation_object.marginRight * 2).toFloat()
-        logViewModel?.addLog("Set animation value")
 
-        val animation = ValueAnimator.ofFloat(animationValue).apply {
+        logViewModel?.addLog("Involve ValueAnimator.ofFloat($animationValue)")
+        val animator = ValueAnimator.ofFloat(animationValue).apply {
             duration = 1000
             interpolator = getSelectedInterpolator()
             addUpdateListener { updatedAnimation ->
-                logViewModel?.addLog("Animated value = " + updatedAnimation.animatedValue)
+                logViewModel?.addLog("Change view translationX to " + updatedAnimation.animatedValue)
                 view_animation_object.translationX = updatedAnimation.animatedValue as Float
             }
-            logViewModel?.addLog(
-                String.format(
-                    "Creating animator\nDuration = %s\nInterpolator = %s",
-                    duration,
-                    interpolator::class.java.simpleName
-                )
-            )
+            val interpolatorClassName = interpolator::class.java.simpleName
+            logViewModel?.addLog("Set:\nDuration = $duration\nInterpolator = $interpolatorClassName")
         }
 
-        animation.start()
+        animator.start()
         logViewModel?.addLog("Start animation")
+    }
+
+    private fun startObjectAnimation() {
+        logViewModel?.addLog("Creating ObjectAnimator")
+        val animationValue =
+            (resources.displayMetrics.widthPixels - view_animation_object.width - view_animation_object.marginRight * 2).toFloat()
+
+        logViewModel?.addLog("Involve ObjectAnimator.ofFloat(view_animation_object, \"translationX\", $animationValue)")
+        val animator =
+            ObjectAnimator.ofFloat(view_animation_object, "translationX", animationValue).apply {
+                duration = 1000
+                interpolator = getSelectedInterpolator()
+                val interpolatorClassName = interpolator::class.java.simpleName
+                logViewModel?.addLog("Set:\nDuration = $duration\nInterpolator = $interpolatorClassName")
+            }
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                logViewModel?.addLog("Animation finished object translationX is now " + view_animation_object.translationX)
+            }
+        })
+
+        logViewModel?.addLog("Reset animation object translationX to 0f")
+        view_animation_object.translationX = 0f
+
+        animator.start()
+        logViewModel?.addLog("Start animation")
+    }
+
+    private fun startAnimatorSet() {
+        val animationValue =
+            (resources.displayMetrics.widthPixels - view_animation_object.width - view_animation_object.marginRight * 2).toFloat()
+
+        logViewModel?.addLog("Creating move animator")
+        logViewModel?.addLog("Involve ObjectAnimator.ofFloat(view_animation_object, \"translationX\", $animationValue)")
+        val moveAnimator =
+            ObjectAnimator.ofFloat(view_animation_object, "translationX", animationValue).apply {
+                duration = 1000
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator?) {
+                        logViewModel?.addLog("Play move animator")
+                    }
+                })
+            }
+
+        logViewModel?.addLog("Creating scale X animator")
+        logViewModel?.addLog("Involve ObjectAnimator.ofFloat(view_animation_object, \"scaleX\", 1.5f)")
+        val scaleXAnimator = ObjectAnimator.ofFloat(view_animation_object, "scaleX", 1.5f).apply {
+            duration = 1000
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    logViewModel?.addLog("Play scale X animator")
+                }
+            })
+        }
+
+        logViewModel?.addLog("Creating scale Y animator")
+        logViewModel?.addLog("Involve ObjectAnimator.ofFloat(view_animation_object, \"scaleY\", 1.5f)")
+        val scaleYAnimator = ObjectAnimator.ofFloat(view_animation_object, "scaleY", 1.5f).apply {
+            duration = 1000
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    logViewModel?.addLog("Play scale Y animator")
+                }
+            })
+        }
+
+        logViewModel?.addLog("Creating color animator")
+        logViewModel?.addLog("Involve ObjectAnimator.ofFloat(view_animation_object, \"backgroundColor\", colorPrimary, Color.MAGENTA)")
+        val colorAnimator = ObjectAnimator.ofArgb(
+            view_animation_object,
+            "backgroundColor",
+            ContextCompat.getColor(requireContext(), R.color.colorPrimary),
+            Color.MAGENTA
+        ).apply {
+            duration = 1000
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    logViewModel?.addLog("Play color animator")
+                }
+            })
+        }
+
+        val animatorSet = AnimatorSet().apply {
+            playSequentially(moveAnimator)
+            play(scaleXAnimator).with(moveAnimator)
+            play(scaleYAnimator).after(moveAnimator)
+            play(colorAnimator).with(scaleYAnimator)
+        }.apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    logViewModel?.addLog("All animator played")
+                }
+            })
+        }
+
+        logViewModel?.addLog("Reset animation object translationX to 0f")
+        view_animation_object.translationX = 0f
+        view_animation_object.scaleX = 1f
+        view_animation_object.scaleY = 1f
+        view_animation_object.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorPrimary
+            )
+        )
+        animatorSet.start()
     }
 }
 

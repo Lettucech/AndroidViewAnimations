@@ -5,7 +5,8 @@ package io.github.lettucech.example.android.viewanimations.util
  */
 enum class AnimatorType(val label: String) {
     VALUE_ANIMATOR("ValueAnimator"),
-    OBJECT_ANIMATOR("ObjectAnimator");
+    OBJECT_ANIMATOR("ObjectAnimator"),
+    ANIMATOR_SET("AnimatorSet");
 
     companion object {
         fun toLabelArray() = ArrayList<String>().apply {
