@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginRight
@@ -47,6 +48,15 @@ class PropertyAnimationFragment : Fragment() {
         )
         animatorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner_animator.adapter = animatorAdapter
+        spinner_animator.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                spinner_interpolator.isEnabled = spinner_animator.getItemAtPosition(position) != AnimatorType.ANIMATOR_SET.label
+            }
+
+        }
 
         val interpolatorAdapter = ArrayAdapter(
             requireContext(),
