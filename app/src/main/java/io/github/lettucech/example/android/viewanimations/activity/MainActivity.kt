@@ -6,9 +6,13 @@ import android.animation.ValueAnimator
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import io.github.lettucech.example.android.viewanimations.R
 import io.github.lettucech.example.android.viewanimations.viewmodel.LogConsoleViewModel
@@ -22,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setupActionBarWithNavController(findNavController(R.id.fragment_nav_host))
 
         logViewModel = ViewModelProviders.of(this).get(LogConsoleViewModel::class.java)
 
@@ -69,6 +75,18 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 animator.start()
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+            else -> {
+                return super.onOptionsItemSelected(item)
             }
         }
     }
